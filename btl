@@ -1,0 +1,1768 @@
+# ============================================================
+# ĐỀ TÀI:
+# # ============================================================
+# ĐỀ TÀI:
+# XÂY DỰNG ỨNG DỤNG QUẢN LÝ SÁCH BÀI TẬP
+# VÀ LỊCH ÔN TẬP BẰNG PYTHON
+# ============================================================
+
+from datetime import datetime
+
+
+# ============================================================
+# 1. CÁC HÀM KIỂM TRA DỮ LIỆU
+# ============================================================
+
+def nhap_chuoi_bat_buoc(thong_bao):
+    while True:
+        value = input(thong_bao).strip()
+
+        if value == "":
+            print("Lỗi: Thông tin không được để trống!")
+        else:
+            return value
+
+
+def nhap_so_nguyen(thong_bao, min_value=0):
+    while True:
+        try:
+            value = int(input(thong_bao))
+
+            if value < min_value:
+                print(f"Lỗi: Giá trị phải >= {min_value}!")
+            else:
+                return value
+
+        except ValueError:
+            print("Lỗi: Vui lòng nhập số nguyên!")
+
+
+def nhap_ngay(thong_bao):
+    while True:
+        value = input(thong_bao).strip()
+
+        try:
+            datetime.strptime(value, "%Y-%m-%d")
+            return value
+        except ValueError:
+            print("Lỗi: Ngày phải có dạng YYYY-MM-DD!")
+
+
+def nhap_gio(thong_bao):
+    while True:
+        value = input(thong_bao).strip()
+
+        try:
+            datetime.strptime(value, "%H:%M")
+            return value
+        except ValueError:
+            print("Lỗi: Thời gian phải có dạng HH:MM!")
+
+
+def nhap_muc_do():
+    while True:
+        print("\nMức độ:")
+        print("1. Dễ")
+        print("2. Trung bình")
+        print("3. Khó")
+
+        choice = input("Chọn mức độ: ").strip()
+
+        if choice == "1":
+            return "Dễ"
+        elif choice == "2":
+            return "Trung bình"
+        elif choice == "3":
+            return "Khó"
+        else:
+            print("Lựa chọn không hợp lệ!")
+
+
+def nhap_trang_thai():
+    while True:
+        print("\nTrạng thái:")
+        print("1. Chưa học")
+        print("2. Đang học")
+        print("3. Đã hoàn thành")
+        print("4. Đã quá hạn")
+
+        choice = input("Chọn trạng thái: ").strip()
+
+        if choice == "1":
+            return "Chưa học"
+        elif choice == "2":
+            return "Đang học"
+        elif choice == "3":
+            return "Đã hoàn thành"
+        elif choice == "4":
+            return "Đã quá hạn"
+        else:
+            print("Lựa chọn không hợp lệ!")
+
+
+# ============================================================
+# 2. HÀM TÌM BẢN GHI
+# ============================================================
+
+def tim_theo_ma(ds, ma):
+    for item in ds:
+        if item["ma_tai_lieu"].lower() == ma.lower():
+            return item
+
+    return None
+
+
+# ============================================================
+# 3. THÊM BẢN GHI
+# ============================================================
+
+def them_ban_ghi(ds):
+    print("\n" + "=" * 70)
+    print("                 THÊM BẢN GHI MỚI")
+    print("=" * 70)
+
+    while True:
+        ma_tai_lieu = nhap_chuoi_bat_buoc("Mã tài liệu: ")
+
+        if tim_theo_ma(ds, ma_tai_lieu) is not None:
+            print("Lỗi: Mã tài liệu đã tồn tại!")
+        else:
+            break
+
+    ten_tai_lieu = nhap_chuoi_bat_buoc("Tên tài liệu: ")
+    mon_hoc = nhap_chuoi_bat_buoc("Môn học: ")
+    loai_tai_lieu = nhap_chuoi_bat_buoc("Loại tài liệu: ")
+
+    so_trang = nhap_so_nguyen("Số trang: ", 1)
+    muc_do = nhap_muc_do()
+    ngay_tao = nhap_ngay("Ngày tạo (YYYY-MM-DD): ")
+
+    while True:
+        ma_lich = nhap_chuoi_bat_buoc("Mã lịch: ")
+
+        # Kiểm tra mã lịch không trùng
+        trung = False
+
+        for item in ds:
+            if item["ma_lich"].lower() == ma_lich.lower():
+                trung = True
+                break
+
+        if trung:
+            print("Lỗi: Mã lịch đã tồn tại!")
+        else:
+            break
+
+    ngay_on = nhap_ngay("Ngày ôn (YYYY-MM-DD): ")
+    thoi_gian = nhap_gio("Thời gian ôn (HH:MM): ")
+    noi_dung = nhap_chuoi_bat_buoc("Nội dung ôn: ")
+    thoi_luong = nhap_so_nguyen("Thời lượng (phút): ", 1)
+    trang_thai = nhap_trang_thai()
+
+    # Kiểm tra logic
+    if trang_thai == "Đã hoàn thành":
+        print("Bản ghi được đánh dấu đã hoàn thành.")
+
+    item = {
+        "ma_tai_lieu": ma_tai_lieu,
+        "ten_tai_lieu": ten_tai_lieu,
+        "mon_hoc": mon_hoc,
+        "loai_tai_lieu": loai_tai_lieu,
+        "so_trang": so_trang,
+        "muc_do": muc_do,
+        "ngay_tao": ngay_tao,
+        "ma_lich": ma_lich,
+        "ngay_on": ngay_on,
+        "thoi_gian": thoi_gian,
+        "noi_dung": noi_dung,
+        "thoi_luong": thoi_luong,
+        "trang_thai": trang_thai
+    }
+
+    ds.append(item)
+
+    print("\nThêm bản ghi thành công!")
+
+
+# ============================================================
+# 4. HIỂN THỊ DANH SÁCH
+# ============================================================
+
+def hien_thi_danh_sach(ds):
+    print("\n" + "=" * 170)
+    print("                         DANH SÁCH TÀI LIỆU VÀ LỊCH ÔN")
+    print("=" * 170)
+
+    if len(ds) == 0:
+        print("Danh sách hiện đang trống.")
+        return
+
+    print(
+        f"{'STT':<5}"
+        f"{'Mã TL':<10}"
+        f"{'Tên tài liệu':<28}"
+        f"{'Môn học':<20}"
+        f"{'Loại':<15}"
+        f"{'Trang':<8}"
+        f"{'Mức độ':<13}"
+        f"{'Ngày tạo':<13}"
+        f"{'Ngày ôn':<13}"
+        f"{'Giờ':<8}"
+        f"{'Phút':<8}"
+        f"{'Trạng thái':<18}"
+    )
+
+    print("-" * 170)
+
+    for i, item in enumerate(ds, 1):
+        ten = item["ten_tai_lieu"][:25]
+        mon = item["mon_hoc"][:17]
+        loai = item["loai_tai_lieu"][:12]
+
+        print(
+            f"{i:<5}"
+            f"{item['ma_tai_lieu']:<10}"
+            f"{ten:<28}"
+            f"{mon:<20}"
+            f"{loai:<15}"
+            f"{item['so_trang']:<8}"
+            f"{item['muc_do']:<13}"
+            f"{item['ngay_tao']:<13}"
+            f"{item['ngay_on']:<13}"
+            f"{item['thoi_gian']:<8}"
+            f"{item['thoi_luong']:<8}"
+            f"{item['trang_thai']:<18}"
+        )
+
+    print("=" * 170)
+
+
+# ============================================================
+# 5. HIỂN THỊ CHI TIẾT
+# ============================================================
+
+def hien_thi_chi_tiet(item):
+    print("\n" + "-" * 60)
+    print("                 THÔNG TIN CHI TIẾT")
+    print("-" * 60)
+
+    print("Mã tài liệu :", item["ma_tai_lieu"])
+    print("Tên tài liệu:", item["ten_tai_lieu"])
+    print("Môn học     :", item["mon_hoc"])
+    print("Loại tài liệu:", item["loai_tai_lieu"])
+    print("Số trang    :", item["so_trang"])
+    print("Mức độ      :", item["muc_do"])
+    print("Ngày tạo    :", item["ngay_tao"])
+    print("Mã lịch     :", item["ma_lich"])
+    print("Ngày ôn     :", item["ngay_on"])
+    print("Thời gian   :", item["thoi_gian"])
+    print("Nội dung    :", item["noi_dung"])
+    print("Thời lượng  :", item["thoi_luong"], "phút")
+    print("Trạng thái  :", item["trang_thai"])
+
+    print("-" * 60)
+
+
+# ============================================================
+# 6. CẬP NHẬT
+# ============================================================
+
+def cap_nhat(ds):
+    print("\n" + "=" * 60)
+    print("                    CẬP NHẬT")
+    print("=" * 60)
+
+    ma = input("Nhập mã tài liệu cần cập nhật: ").strip()
+
+    item = tim_theo_ma(ds, ma)
+
+    if item is None:
+        print("Không tìm thấy tài liệu có mã:", ma)
+        return
+
+    hien_thi_chi_tiet(item)
+
+    print("\nNhập thông tin mới:")
+
+    item["ten_tai_lieu"] = nhap_chuoi_bat_buoc("Tên tài liệu mới: ")
+    item["mon_hoc"] = nhap_chuoi_bat_buoc("Môn học mới: ")
+    item["loai_tai_lieu"] = nhap_chuoi_bat_buoc("Loại tài liệu mới: ")
+    item["so_trang"] = nhap_so_nguyen("Số trang mới: ", 1)
+    item["muc_do"] = nhap_muc_do()
+    item["ngay_tao"] = nhap_ngay("Ngày tạo mới: ")
+    item["ngay_on"] = nhap_ngay("Ngày ôn mới: ")
+    item["thoi_gian"] = nhap_gio("Thời gian mới: ")
+    item["noi_dung"] = nhap_chuoi_bat_buoc("Nội dung mới: ")
+    item["thoi_luong"] = nhap_so_nguyen("Thời lượng mới: ", 1)
+    item["trang_thai"] = nhap_trang_thai()
+
+    print("\nCập nhật thành công!")
+
+
+# ============================================================
+# 7. XÓA
+# ============================================================
+
+def xoa(ds):
+    print("\n" + "=" * 60)
+    print("                       XÓA")
+    print("=" * 60)
+
+    ma = input("Nhập mã tài liệu cần xóa: ").strip()
+
+    item = tim_theo_ma(ds, ma)
+
+    if item is None:
+        print("Không tìm thấy tài liệu.")
+        return
+
+    hien_thi_chi_tiet(item)
+
+    confirm = input("Bạn có chắc chắn muốn xóa? (y/n): ").strip().lower()
+
+    if confirm == "y":
+        ds.remove(item)
+        print("Đã xóa thành công!")
+    else:
+        print("Đã hủy thao tác xóa.")
+
+
+# ============================================================
+# 8. TÌM KIẾM THEO TÊN
+# ============================================================
+
+def tim_theo_ten(ds):
+    keyword = input("Nhập tên tài liệu cần tìm: ").strip().lower()
+
+    ket_qua = []
+
+    for item in ds:
+        if keyword in item["ten_tai_lieu"].lower():
+            ket_qua.append(item)
+
+    if len(ket_qua) == 0:
+        print("Không tìm thấy tài liệu phù hợp.")
+    else:
+        print("\nTìm thấy", len(ket_qua), "kết quả.")
+        hien_thi_danh_sach(ket_qua)
+
+
+# ============================================================
+# 9. TÌM KIẾM THEO MÔN
+# ============================================================
+
+def tim_theo_mon(ds):
+    keyword = input("Nhập môn học cần tìm: ").strip().lower()
+
+    ket_qua = []
+
+    for item in ds:
+        if keyword in item["mon_hoc"].lower():
+            ket_qua.append(item)
+
+    if len(ket_qua) == 0:
+        print("Không tìm thấy tài liệu thuộc môn này.")
+    else:
+        hien_thi_danh_sach(ket_qua)
+
+
+# ============================================================
+# 10. TÌM KIẾM THEO MỨC ĐỘ
+# ============================================================
+
+def tim_theo_muc_do(ds):
+    muc_do = nhap_muc_do()
+
+    ket_qua = []
+
+    for item in ds:
+        if item["muc_do"] == muc_do:
+            ket_qua.append(item)
+
+    if len(ket_qua) == 0:
+        print("Không tìm thấy tài liệu phù hợp.")
+    else:
+        hien_thi_danh_sach(ket_qua)
+
+
+# ============================================================
+# 11. TÌM KIẾM THEO NGÀY ÔN
+# ============================================================
+
+def tim_theo_ngay_on(ds):
+    ngay = nhap_ngay("Nhập ngày ôn cần tìm: ")
+
+    ket_qua = []
+
+    for item in ds:
+        if item["ngay_on"] == ngay:
+            ket_qua.append(item)
+
+    if len(ket_qua) == 0:
+        print("Không có lịch ôn vào ngày", ngay)
+    else:
+        hien_thi_danh_sach(ket_qua)
+
+
+# ============================================================
+# 12. MENU TÌM KIẾM
+# ============================================================
+
+def menu_tim_kiem(ds):
+    while True:
+        print("\n" + "=" * 50)
+        print("                  TÌM KIẾM")
+        print("=" * 50)
+        print("1. Tìm theo tên tài liệu")
+        print("2. Tìm theo môn học")
+        print("3. Tìm theo mức độ")
+        print("4. Tìm theo ngày ôn")
+        print("0. Quay lại")
+
+        choice = input("Lựa chọn: ").strip()
+
+        if choice == "1":
+            tim_theo_ten(ds)
+        elif choice == "2":
+            tim_theo_mon(ds)
+        elif choice == "3":
+            tim_theo_muc_do(ds)
+        elif choice == "4":
+            tim_theo_ngay_on(ds)
+        elif choice == "0":
+            break
+        else:
+            print("Lựa chọn không hợp lệ!")
+
+
+# ============================================================
+# 13. SẮP XẾP
+# ============================================================
+
+def sap_xep(ds):
+    if len(ds) == 0:
+        print("Danh sách trống!")
+        return
+
+    print("\n" + "=" * 60)
+    print("                    SẮP XẾP")
+    print("=" * 60)
+    print("1. Theo ngày tạo")
+    print("2. Theo số trang")
+    print("3. Theo ngày/giờ ôn")
+    print("4. Theo mức độ")
+    print("0. Quay lại")
+
+    choice = input("Lựa chọn: ").strip()
+
+    if choice == "0":
+        return
+
+    print("\n1. Tăng dần")
+    print("2. Giảm dần")
+
+    order = input("Chọn kiểu sắp xếp: ").strip()
+
+    if order not in ["1", "2"]:
+        print("Lựa chọn không hợp lệ!")
+        return
+
+    reverse = order == "2"
+
+    if choice == "1":
+        ds.sort(key=lambda x: x["ngay_tao"], reverse=reverse)
+
+    elif choice == "2":
+        ds.sort(key=lambda x: x["so_trang"], reverse=reverse)
+
+    elif choice == "3":
+        ds.sort(
+            key=lambda x: datetime.strptime(
+                x["ngay_on"] + " " + x["thoi_gian"],
+                "%Y-%m-%d %H:%M"
+            ),
+            reverse=reverse
+        )
+
+    elif choice == "4":
+        muc_do_value = {
+            "Dễ": 1,
+            "Trung bình": 2,
+            "Khó": 3
+        }
+
+        ds.sort(
+            key=lambda x: muc_do_value[x["muc_do"]],
+            reverse=reverse
+        )
+
+    else:
+        print("Lựa chọn không hợp lệ!")
+        return
+
+    print("\nSắp xếp thành công!")
+    hien_thi_danh_sach(ds)
+
+
+# ============================================================
+# 14. THỐNG KÊ THỜI GIAN ÔN THEO MÔN
+# ============================================================
+
+def thong_ke_thoi_gian_theo_mon(ds):
+    thong_ke = {}
+
+    for item in ds:
+        mon = item["mon_hoc"]
+
+        if mon not in thong_ke:
+            thong_ke[mon] = 0
+
+        thong_ke[mon] += item["thoi_luong"]
+
+    print("\n" + "=" * 55)
+    print("             THỜI GIAN ÔN THEO MÔN")
+    print("=" * 55)
+
+    if len(thong_ke) == 0:
+        print("Chưa có dữ liệu.")
+        return
+
+    for mon, tong_phut in thong_ke.items():
+        gio = tong_phut // 60
+        phut = tong_phut % 60
+
+        print(f"{mon:<30} : {gio} giờ {phut} phút")
+
+
+# ============================================================
+# 15. THỐNG KÊ TÀI LIỆU THEO MỨC ĐỘ
+# ============================================================
+
+def thong_ke_muc_do(ds):
+    thong_ke = {
+        "Dễ": 0,
+        "Trung bình": 0,
+        "Khó": 0
+    }
+
+    for item in ds:
+        muc_do = item["muc_do"]
+
+        if muc_do in thong_ke:
+            thong_ke[muc_do] += 1
+
+    print("\n" + "=" * 45)
+    print("              TÀI LIỆU THEO MỨC ĐỘ")
+    print("=" * 45)
+
+    for muc_do, so_luong in thong_ke.items():
+        print(f"{muc_do:<20}: {so_luong} tài liệu")
+
+
+# ============================================================
+# 16. THỐNG KÊ LỊCH THEO TRẠNG THÁI
+# ============================================================
+
+def thong_ke_trang_thai(ds):
+    thong_ke = {
+        "Chưa học": 0,
+        "Đang học": 0,
+        "Đã hoàn thành": 0,
+        "Đã quá hạn": 0
+    }
+
+    for item in ds:
+        trang_thai = item["trang_thai"]
+
+        if trang_thai in thong_ke:
+            thong_ke[trang_thai] += 1
+
+    print("\n" + "=" * 50)
+    print("              LỊCH ÔN THEO TRẠNG THÁI")
+    print("=" * 50)
+
+    for trang_thai, so_luong in thong_ke.items():
+        print(f"{trang_thai:<25}: {so_luong}")
+
+
+# ============================================================
+# 17. CẢNH BÁO LỊCH TRÙNG
+# ============================================================
+
+def canh_bao_lich_trung(ds):
+    print("\n" + "=" * 65)
+    print("                   CẢNH BÁO LỊCH TRÙNG")
+    print("=" * 65)
+
+    da_trung = False
+
+    for i in range(len(ds)):
+        for j in range(i + 1, len(ds)):
+
+            lich_1 = ds[i]
+            lich_2 = ds[j]
+
+            if (
+                lich_1["ngay_on"] == lich_2["ngay_on"]
+                and lich_1["thoi_gian"] == lich_2["thoi_gian"]
+            ):
+                da_trung = True
+
+                print("\nPhát hiện lịch trùng:")
+                print(
+                    f"- {lich_1['ma_tai_lieu']} - "
+                    f"{lich_1['ten_tai_lieu']}"
+                )
+
+                print(
+                    f"- {lich_2['ma_tai_lieu']} - "
+                    f"{lich_2['ten_tai_lieu']}"
+                )
+
+                print(
+                    f"Thời gian: "
+                    f"{lich_1['ngay_on']} "
+                    f"{lich_1['thoi_gian']}"
+                )
+
+    if not da_trung:
+        print("Không phát hiện lịch ôn bị trùng.")
+
+
+# ============================================================
+# 18. THỐNG KÊ TỔNG QUAN
+# ============================================================
+
+def thong_ke_tong_quan(ds):
+    print("\n" + "=" * 55)
+    print("                 THỐNG KÊ TỔNG QUAN")
+    print("=" * 55)
+
+    tong_tai_lieu = len(ds)
+    tong_trang = 0
+    tong_thoi_gian = 0
+
+    for item in ds:
+        tong_trang += item["so_trang"]
+        tong_thoi_gian += item["thoi_luong"]
+
+    print("Tổng số tài liệu :", tong_tai_lieu)
+    print("Tổng số trang    :", tong_trang)
+    print("Tổng thời gian ôn:", tong_thoi_gian, "phút")
+    print(
+        "Tương đương      :",
+        tong_thoi_gian // 60,
+        "giờ",
+        tong_thoi_gian % 60,
+        "phút"
+    )
+
+
+# ============================================================
+# 19. MENU THỐNG KÊ
+# ============================================================
+
+def menu_thong_ke(ds):
+    while True:
+        print("\n" + "=" * 55)
+        print("                TÍNH TOÁN / THỐNG KÊ")
+        print("=" * 55)
+
+        print("1. Thống kê tổng quan")
+        print("2. Thời gian ôn theo môn")
+        print("3. Tài liệu theo mức độ")
+        print("4. Lịch ôn theo trạng thái")
+        print("5. Cảnh báo lịch trùng")
+        print("0. Quay lại")
+
+        choice = input("Lựa chọn: ").strip()
+
+        if choice == "1":
+            thong_ke_tong_quan(ds)
+
+        elif choice == "2":
+            thong_ke_thoi_gian_theo_mon(ds)
+
+        elif choice == "3":
+            thong_ke_muc_do(ds)
+
+        elif choice == "4":
+            thong_ke_trang_thai(ds)
+
+        elif choice == "5":
+            canh_bao_lich_trung(ds)
+
+        elif choice == "0":
+            break
+
+        else:
+            print("Lựa chọn không hợp lệ!")
+
+
+# ============================================================
+# 20. LƯU DỮ LIỆU VÀO FILE TXT
+# ============================================================
+
+def luu_du_lieu(ds, filename="data.txt"):
+    try:
+        with open(filename, "w", encoding="utf-8") as file:
+
+            for item in ds:
+                line = "|".join([
+                    item["ma_tai_lieu"],
+                    item["ten_tai_lieu"],
+                    item["mon_hoc"],
+                    item["loai_tai_lieu"],
+                    str(item["so_trang"]),
+                    item["muc_do"],
+                    item["ngay_tao"],
+                    item["ma_lich"],
+                    item["ngay_on"],
+                    item["thoi_gian"],
+                    item["noi_dung"],
+                    str(item["thoi_luong"]),
+                    item["trang_thai"]
+                ])
+
+                file.write(line + "\n")
+
+        print(f"Lưu dữ liệu thành công vào file {filename}!")
+
+    except PermissionError:
+        print("Lỗi: Không có quyền ghi file.")
+
+    except OSError as e:
+        print("Lỗi khi ghi file:", e)
+
+
+# ============================================================
+# 21. ĐỌC DỮ LIỆU TỪ FILE TXT
+# ============================================================
+
+def doc_du_lieu(filename="data.txt"):
+    ds = []
+
+    try:
+        with open(filename, "r", encoding="utf-8") as file:
+
+            for line_number, line in enumerate(file, 1):
+
+                line = line.strip()
+
+                if line == "":
+                    continue
+
+                parts = line.split("|")
+
+                if len(parts) != 13:
+                    print(
+                        f"Cảnh báo: Dòng {line_number} "
+                        f"không đúng định dạng."
+                    )
+                    continue
+
+                try:
+                    item = {
+                        "ma_tai_lieu": parts[0],
+                        "ten_tai_lieu": parts[1],
+                        "mon_hoc": parts[2],
+                        "loai_tai_lieu": parts[3],
+                        "so_trang": int(parts[4]),
+                        "muc_do": parts[5],
+                        "ngay_tao": parts[6],
+                        "ma_lich": parts[7],
+                        "ngay_on": parts[8],
+                        "thoi_gian": parts[9],
+                        "noi_dung": parts[10],
+                        "thoi_luong": int(parts[11]),
+                        "trang_thai": parts[12]
+                    }
+
+                    ds.append(item)
+
+                except ValueError:
+                    print(
+                        f"Cảnh báo: Không thể chuyển kiểu dữ liệu "
+                        f"ở dòng {line_number}."
+                    )
+
+        print(f"Đọc dữ liệu thành công: {len(ds)} bản ghi.")
+
+    except FileNotFoundError:
+        print(f"Không tìm thấy file {filename}.")
+        print("Chương trình sẽ sử dụng danh sách rỗng.")
+
+    except PermissionError:
+        print("Lỗi: Không có quyền đọc file.")
+
+    except OSError as e:
+        print("Lỗi khi đọc file:", e)
+
+    return ds
+
+
+# ============================================================
+# 22. MENU CHÍNH
+# ============================================================
+
+def menu_chinh():
+    print("\n" + "=" * 70)
+    print("      ỨNG DỤNG QUẢN LÝ SÁCH BÀI TẬP VÀ LỊCH ÔN TẬP")
+    print("=" * 70)
+
+    print("1. Thêm")
+    print("2. Hiển thị danh sách")
+    print("3. Cập nhật")
+    print("4. Xóa")
+    print("5. Tìm kiếm")
+    print("6. Sắp xếp")
+    print("7. Tính toán / Thống kê")
+    print("8. Lưu dữ liệu")
+    print("9. Đọc dữ liệu")
+    print("0. Thoát")
+
+    print("-" * 70)
+
+
+# ============================================================
+# 23. CHƯƠNG TRÌNH CHÍNH
+# ============================================================
+
+def main():
+
+    # Đọc dữ liệu khi khởi động
+    danh_sach = doc_du_lieu()
+
+    while True:
+
+        menu_chinh()
+
+        choice = input("Lựa chọn: ").strip()
+
+        if choice == "1":
+            them_ban_ghi(danh_sach)
+
+        elif choice == "2":
+            hien_thi_danh_sach(danh_sach)
+
+        elif choice == "3":
+            cap_nhat(danh_sach)
+
+        elif choice == "4":
+            xoa(danh_sach)
+
+        elif choice == "5":
+            menu_tim_kiem(danh_sach)
+
+        elif choice == "6":
+            sap_xep(danh_sach)
+
+        elif choice == "7":
+            menu_thong_ke(danh_sach)
+
+        elif choice == "8":
+            luu_du_lieu(danh_sach)
+
+        elif choice == "9":
+            danh_sach = doc_du_lieu()
+
+        elif choice == "0":
+
+            # Tự động lưu trước khi thoát
+            luu_du_lieu(danh_sach)
+
+            print("\nCảm ơn bạn đã sử dụng chương trình!")
+            print("Chương trình kết thúc.")
+            break
+
+        else:
+            print("Lựa chọn không hợp lệ! Vui lòng chọn lại.")
+
+
+# ============================================================
+# CHẠY CHƯƠNG TRÌNH
+# ============================================================
+
+if __name__ == "__main__":
+    main()
+# ============================================================
+
+from datetime import datetime
+
+
+# ============================================================
+# 1. CÁC HÀM KIỂM TRA DỮ LIỆU
+# ============================================================
+
+def nhap_chuoi_bat_buoc(thong_bao):
+    while True:
+        value = input(thong_bao).strip()
+
+        if value == "":
+            print("Lỗi: Thông tin không được để trống!")
+        else:
+            return value
+
+
+def nhap_so_nguyen(thong_bao, min_value=0):
+    while True:
+        try:
+            value = int(input(thong_bao))
+
+            if value < min_value:
+                print(f"Lỗi: Giá trị phải >= {min_value}!")
+            else:
+                return value
+
+        except ValueError:
+            print("Lỗi: Vui lòng nhập số nguyên!")
+
+
+def nhap_ngay(thong_bao):
+    while True:
+        value = input(thong_bao).strip()
+
+        try:
+            datetime.strptime(value, "%Y-%m-%d")
+            return value
+        except ValueError:
+            print("Lỗi: Ngày phải có dạng YYYY-MM-DD!")
+
+
+def nhap_gio(thong_bao):
+    while True:
+        value = input(thong_bao).strip()
+
+        try:
+            datetime.strptime(value, "%H:%M")
+            return value
+        except ValueError:
+            print("Lỗi: Thời gian phải có dạng HH:MM!")
+
+
+def nhap_muc_do():
+    while True:
+        print("\nMức độ:")
+        print("1. Dễ")
+        print("2. Trung bình")
+        print("3. Khó")
+
+        choice = input("Chọn mức độ: ").strip()
+
+        if choice == "1":
+            return "Dễ"
+        elif choice == "2":
+            return "Trung bình"
+        elif choice == "3":
+            return "Khó"
+        else:
+            print("Lựa chọn không hợp lệ!")
+
+
+def nhap_trang_thai():
+    while True:
+        print("\nTrạng thái:")
+        print("1. Chưa học")
+        print("2. Đang học")
+        print("3. Đã hoàn thành")
+        print("4. Đã quá hạn")
+
+        choice = input("Chọn trạng thái: ").strip()
+
+        if choice == "1":
+            return "Chưa học"
+        elif choice == "2":
+            return "Đang học"
+        elif choice == "3":
+            return "Đã hoàn thành"
+        elif choice == "4":
+            return "Đã quá hạn"
+        else:
+            print("Lựa chọn không hợp lệ!")
+
+
+# ============================================================
+# 2. HÀM TÌM BẢN GHI
+# ============================================================
+
+def tim_theo_ma(ds, ma):
+    for item in ds:
+        if item["ma_tai_lieu"].lower() == ma.lower():
+            return item
+
+    return None
+
+
+# ============================================================
+# 3. THÊM BẢN GHI
+# ============================================================
+
+def them_ban_ghi(ds):
+    print("\n" + "=" * 70)
+    print("                 THÊM BẢN GHI MỚI")
+    print("=" * 70)
+
+    while True:
+        ma_tai_lieu = nhap_chuoi_bat_buoc("Mã tài liệu: ")
+
+        if tim_theo_ma(ds, ma_tai_lieu) is not None:
+            print("Lỗi: Mã tài liệu đã tồn tại!")
+        else:
+            break
+
+    ten_tai_lieu = nhap_chuoi_bat_buoc("Tên tài liệu: ")
+    mon_hoc = nhap_chuoi_bat_buoc("Môn học: ")
+    loai_tai_lieu = nhap_chuoi_bat_buoc("Loại tài liệu: ")
+
+    so_trang = nhap_so_nguyen("Số trang: ", 1)
+    muc_do = nhap_muc_do()
+    ngay_tao = nhap_ngay("Ngày tạo (YYYY-MM-DD): ")
+
+    while True:
+        ma_lich = nhap_chuoi_bat_buoc("Mã lịch: ")
+
+        # Kiểm tra mã lịch không trùng
+        trung = False
+
+        for item in ds:
+            if item["ma_lich"].lower() == ma_lich.lower():
+                trung = True
+                break
+
+        if trung:
+            print("Lỗi: Mã lịch đã tồn tại!")
+        else:
+            break
+
+    ngay_on = nhap_ngay("Ngày ôn (YYYY-MM-DD): ")
+    thoi_gian = nhap_gio("Thời gian ôn (HH:MM): ")
+    noi_dung = nhap_chuoi_bat_buoc("Nội dung ôn: ")
+    thoi_luong = nhap_so_nguyen("Thời lượng (phút): ", 1)
+    trang_thai = nhap_trang_thai()
+
+    # Kiểm tra logic
+    if trang_thai == "Đã hoàn thành":
+        print("Bản ghi được đánh dấu đã hoàn thành.")
+
+    item = {
+        "ma_tai_lieu": ma_tai_lieu,
+        "ten_tai_lieu": ten_tai_lieu,
+        "mon_hoc": mon_hoc,
+        "loai_tai_lieu": loai_tai_lieu,
+        "so_trang": so_trang,
+        "muc_do": muc_do,
+        "ngay_tao": ngay_tao,
+        "ma_lich": ma_lich,
+        "ngay_on": ngay_on,
+        "thoi_gian": thoi_gian,
+        "noi_dung": noi_dung,
+        "thoi_luong": thoi_luong,
+        "trang_thai": trang_thai
+    }
+
+    ds.append(item)
+
+    print("\nThêm bản ghi thành công!")
+
+
+# ============================================================
+# 4. HIỂN THỊ DANH SÁCH
+# ============================================================
+
+def hien_thi_danh_sach(ds):
+    print("\n" + "=" * 170)
+    print("                         DANH SÁCH TÀI LIỆU VÀ LỊCH ÔN")
+    print("=" * 170)
+
+    if len(ds) == 0:
+        print("Danh sách hiện đang trống.")
+        return
+
+    print(
+        f"{'STT':<5}"
+        f"{'Mã TL':<10}"
+        f"{'Tên tài liệu':<28}"
+        f"{'Môn học':<20}"
+        f"{'Loại':<15}"
+        f"{'Trang':<8}"
+        f"{'Mức độ':<13}"
+        f"{'Ngày tạo':<13}"
+        f"{'Ngày ôn':<13}"
+        f"{'Giờ':<8}"
+        f"{'Phút':<8}"
+        f"{'Trạng thái':<18}"
+    )
+
+    print("-" * 170)
+
+    for i, item in enumerate(ds, 1):
+        ten = item["ten_tai_lieu"][:25]
+        mon = item["mon_hoc"][:17]
+        loai = item["loai_tai_lieu"][:12]
+
+        print(
+            f"{i:<5}"
+            f"{item['ma_tai_lieu']:<10}"
+            f"{ten:<28}"
+            f"{mon:<20}"
+            f"{loai:<15}"
+            f"{item['so_trang']:<8}"
+            f"{item['muc_do']:<13}"
+            f"{item['ngay_tao']:<13}"
+            f"{item['ngay_on']:<13}"
+            f"{item['thoi_gian']:<8}"
+            f"{item['thoi_luong']:<8}"
+            f"{item['trang_thai']:<18}"
+        )
+
+    print("=" * 170)
+
+
+# ============================================================
+# 5. HIỂN THỊ CHI TIẾT
+# ============================================================
+
+def hien_thi_chi_tiet(item):
+    print("\n" + "-" * 60)
+    print("                 THÔNG TIN CHI TIẾT")
+    print("-" * 60)
+
+    print("Mã tài liệu :", item["ma_tai_lieu"])
+    print("Tên tài liệu:", item["ten_tai_lieu"])
+    print("Môn học     :", item["mon_hoc"])
+    print("Loại tài liệu:", item["loai_tai_lieu"])
+    print("Số trang    :", item["so_trang"])
+    print("Mức độ      :", item["muc_do"])
+    print("Ngày tạo    :", item["ngay_tao"])
+    print("Mã lịch     :", item["ma_lich"])
+    print("Ngày ôn     :", item["ngay_on"])
+    print("Thời gian   :", item["thoi_gian"])
+    print("Nội dung    :", item["noi_dung"])
+    print("Thời lượng  :", item["thoi_luong"], "phút")
+    print("Trạng thái  :", item["trang_thai"])
+
+    print("-" * 60)
+
+
+# ============================================================
+# 6. CẬP NHẬT
+# ============================================================
+
+def cap_nhat(ds):
+    print("\n" + "=" * 60)
+    print("                    CẬP NHẬT")
+    print("=" * 60)
+
+    ma = input("Nhập mã tài liệu cần cập nhật: ").strip()
+
+    item = tim_theo_ma(ds, ma)
+
+    if item is None:
+        print("Không tìm thấy tài liệu có mã:", ma)
+        return
+
+    hien_thi_chi_tiet(item)
+
+    print("\nNhập thông tin mới:")
+
+    item["ten_tai_lieu"] = nhap_chuoi_bat_buoc("Tên tài liệu mới: ")
+    item["mon_hoc"] = nhap_chuoi_bat_buoc("Môn học mới: ")
+    item["loai_tai_lieu"] = nhap_chuoi_bat_buoc("Loại tài liệu mới: ")
+    item["so_trang"] = nhap_so_nguyen("Số trang mới: ", 1)
+    item["muc_do"] = nhap_muc_do()
+    item["ngay_tao"] = nhap_ngay("Ngày tạo mới: ")
+    item["ngay_on"] = nhap_ngay("Ngày ôn mới: ")
+    item["thoi_gian"] = nhap_gio("Thời gian mới: ")
+    item["noi_dung"] = nhap_chuoi_bat_buoc("Nội dung mới: ")
+    item["thoi_luong"] = nhap_so_nguyen("Thời lượng mới: ", 1)
+    item["trang_thai"] = nhap_trang_thai()
+
+    print("\nCập nhật thành công!")
+
+
+# ============================================================
+# 7. XÓA
+# ============================================================
+
+def xoa(ds):
+    print("\n" + "=" * 60)
+    print("                       XÓA")
+    print("=" * 60)
+
+    ma = input("Nhập mã tài liệu cần xóa: ").strip()
+
+    item = tim_theo_ma(ds, ma)
+
+    if item is None:
+        print("Không tìm thấy tài liệu.")
+        return
+
+    hien_thi_chi_tiet(item)
+
+    confirm = input("Bạn có chắc chắn muốn xóa? (y/n): ").strip().lower()
+
+    if confirm == "y":
+        ds.remove(item)
+        print("Đã xóa thành công!")
+    else:
+        print("Đã hủy thao tác xóa.")
+
+
+# ============================================================
+# 8. TÌM KIẾM THEO TÊN
+# ============================================================
+
+def tim_theo_ten(ds):
+    keyword = input("Nhập tên tài liệu cần tìm: ").strip().lower()
+
+    ket_qua = []
+
+    for item in ds:
+        if keyword in item["ten_tai_lieu"].lower():
+            ket_qua.append(item)
+
+    if len(ket_qua) == 0:
+        print("Không tìm thấy tài liệu phù hợp.")
+    else:
+        print("\nTìm thấy", len(ket_qua), "kết quả.")
+        hien_thi_danh_sach(ket_qua)
+
+
+# ============================================================
+# 9. TÌM KIẾM THEO MÔN
+# ============================================================
+
+def tim_theo_mon(ds):
+    keyword = input("Nhập môn học cần tìm: ").strip().lower()
+
+    ket_qua = []
+
+    for item in ds:
+        if keyword in item["mon_hoc"].lower():
+            ket_qua.append(item)
+
+    if len(ket_qua) == 0:
+        print("Không tìm thấy tài liệu thuộc môn này.")
+    else:
+        hien_thi_danh_sach(ket_qua)
+
+
+# ============================================================
+# 10. TÌM KIẾM THEO MỨC ĐỘ
+# ============================================================
+
+def tim_theo_muc_do(ds):
+    muc_do = nhap_muc_do()
+
+    ket_qua = []
+
+    for item in ds:
+        if item["muc_do"] == muc_do:
+            ket_qua.append(item)
+
+    if len(ket_qua) == 0:
+        print("Không tìm thấy tài liệu phù hợp.")
+    else:
+        hien_thi_danh_sach(ket_qua)
+
+
+# ============================================================
+# 11. TÌM KIẾM THEO NGÀY ÔN
+# ============================================================
+
+def tim_theo_ngay_on(ds):
+    ngay = nhap_ngay("Nhập ngày ôn cần tìm: ")
+
+    ket_qua = []
+
+    for item in ds:
+        if item["ngay_on"] == ngay:
+            ket_qua.append(item)
+
+    if len(ket_qua) == 0:
+        print("Không có lịch ôn vào ngày", ngay)
+    else:
+        hien_thi_danh_sach(ket_qua)
+
+
+# ============================================================
+# 12. MENU TÌM KIẾM
+# ============================================================
+
+def menu_tim_kiem(ds):
+    while True:
+        print("\n" + "=" * 50)
+        print("                  TÌM KIẾM")
+        print("=" * 50)
+        print("1. Tìm theo tên tài liệu")
+        print("2. Tìm theo môn học")
+        print("3. Tìm theo mức độ")
+        print("4. Tìm theo ngày ôn")
+        print("0. Quay lại")
+
+        choice = input("Lựa chọn: ").strip()
+
+        if choice == "1":
+            tim_theo_ten(ds)
+        elif choice == "2":
+            tim_theo_mon(ds)
+        elif choice == "3":
+            tim_theo_muc_do(ds)
+        elif choice == "4":
+            tim_theo_ngay_on(ds)
+        elif choice == "0":
+            break
+        else:
+            print("Lựa chọn không hợp lệ!")
+
+
+# ============================================================
+# 13. SẮP XẾP
+# ============================================================
+
+def sap_xep(ds):
+    if len(ds) == 0:
+        print("Danh sách trống!")
+        return
+
+    print("\n" + "=" * 60)
+    print("                    SẮP XẾP")
+    print("=" * 60)
+    print("1. Theo ngày tạo")
+    print("2. Theo số trang")
+    print("3. Theo ngày/giờ ôn")
+    print("4. Theo mức độ")
+    print("0. Quay lại")
+
+    choice = input("Lựa chọn: ").strip()
+
+    if choice == "0":
+        return
+
+    print("\n1. Tăng dần")
+    print("2. Giảm dần")
+
+    order = input("Chọn kiểu sắp xếp: ").strip()
+
+    if order not in ["1", "2"]:
+        print("Lựa chọn không hợp lệ!")
+        return
+
+    reverse = order == "2"
+
+    if choice == "1":
+        ds.sort(key=lambda x: x["ngay_tao"], reverse=reverse)
+
+    elif choice == "2":
+        ds.sort(key=lambda x: x["so_trang"], reverse=reverse)
+
+    elif choice == "3":
+        ds.sort(
+            key=lambda x: datetime.strptime(
+                x["ngay_on"] + " " + x["thoi_gian"],
+                "%Y-%m-%d %H:%M"
+            ),
+            reverse=reverse
+        )
+
+    elif choice == "4":
+        muc_do_value = {
+            "Dễ": 1,
+            "Trung bình": 2,
+            "Khó": 3
+        }
+
+        ds.sort(
+            key=lambda x: muc_do_value[x["muc_do"]],
+            reverse=reverse
+        )
+
+    else:
+        print("Lựa chọn không hợp lệ!")
+        return
+
+    print("\nSắp xếp thành công!")
+    hien_thi_danh_sach(ds)
+
+
+# ============================================================
+# 14. THỐNG KÊ THỜI GIAN ÔN THEO MÔN
+# ============================================================
+
+def thong_ke_thoi_gian_theo_mon(ds):
+    thong_ke = {}
+
+    for item in ds:
+        mon = item["mon_hoc"]
+
+        if mon not in thong_ke:
+            thong_ke[mon] = 0
+
+        thong_ke[mon] += item["thoi_luong"]
+
+    print("\n" + "=" * 55)
+    print("             THỜI GIAN ÔN THEO MÔN")
+    print("=" * 55)
+
+    if len(thong_ke) == 0:
+        print("Chưa có dữ liệu.")
+        return
+
+    for mon, tong_phut in thong_ke.items():
+        gio = tong_phut // 60
+        phut = tong_phut % 60
+
+        print(f"{mon:<30} : {gio} giờ {phut} phút")
+
+
+# ============================================================
+# 15. THỐNG KÊ TÀI LIỆU THEO MỨC ĐỘ
+# ============================================================
+
+def thong_ke_muc_do(ds):
+    thong_ke = {
+        "Dễ": 0,
+        "Trung bình": 0,
+        "Khó": 0
+    }
+
+    for item in ds:
+        muc_do = item["muc_do"]
+
+        if muc_do in thong_ke:
+            thong_ke[muc_do] += 1
+
+    print("\n" + "=" * 45)
+    print("              TÀI LIỆU THEO MỨC ĐỘ")
+    print("=" * 45)
+
+    for muc_do, so_luong in thong_ke.items():
+        print(f"{muc_do:<20}: {so_luong} tài liệu")
+
+
+# ============================================================
+# 16. THỐNG KÊ LỊCH THEO TRẠNG THÁI
+# ============================================================
+
+def thong_ke_trang_thai(ds):
+    thong_ke = {
+        "Chưa học": 0,
+        "Đang học": 0,
+        "Đã hoàn thành": 0,
+        "Đã quá hạn": 0
+    }
+
+    for item in ds:
+        trang_thai = item["trang_thai"]
+
+        if trang_thai in thong_ke:
+            thong_ke[trang_thai] += 1
+
+    print("\n" + "=" * 50)
+    print("              LỊCH ÔN THEO TRẠNG THÁI")
+    print("=" * 50)
+
+    for trang_thai, so_luong in thong_ke.items():
+        print(f"{trang_thai:<25}: {so_luong}")
+
+
+# ============================================================
+# 17. CẢNH BÁO LỊCH TRÙNG
+# ============================================================
+
+def canh_bao_lich_trung(ds):
+    print("\n" + "=" * 65)
+    print("                   CẢNH BÁO LỊCH TRÙNG")
+    print("=" * 65)
+
+    da_trung = False
+
+    for i in range(len(ds)):
+        for j in range(i + 1, len(ds)):
+
+            lich_1 = ds[i]
+            lich_2 = ds[j]
+
+            if (
+                lich_1["ngay_on"] == lich_2["ngay_on"]
+                and lich_1["thoi_gian"] == lich_2["thoi_gian"]
+            ):
+                da_trung = True
+
+                print("\nPhát hiện lịch trùng:")
+                print(
+                    f"- {lich_1['ma_tai_lieu']} - "
+                    f"{lich_1['ten_tai_lieu']}"
+                )
+
+                print(
+                    f"- {lich_2['ma_tai_lieu']} - "
+                    f"{lich_2['ten_tai_lieu']}"
+                )
+
+                print(
+                    f"Thời gian: "
+                    f"{lich_1['ngay_on']} "
+                    f"{lich_1['thoi_gian']}"
+                )
+
+    if not da_trung:
+        print("Không phát hiện lịch ôn bị trùng.")
+
+
+# ============================================================
+# 18. THỐNG KÊ TỔNG QUAN
+# ============================================================
+
+def thong_ke_tong_quan(ds):
+    print("\n" + "=" * 55)
+    print("                 THỐNG KÊ TỔNG QUAN")
+    print("=" * 55)
+
+    tong_tai_lieu = len(ds)
+    tong_trang = 0
+    tong_thoi_gian = 0
+
+    for item in ds:
+        tong_trang += item["so_trang"]
+        tong_thoi_gian += item["thoi_luong"]
+
+    print("Tổng số tài liệu :", tong_tai_lieu)
+    print("Tổng số trang    :", tong_trang)
+    print("Tổng thời gian ôn:", tong_thoi_gian, "phút")
+    print(
+        "Tương đương      :",
+        tong_thoi_gian // 60,
+        "giờ",
+        tong_thoi_gian % 60,
+        "phút"
+    )
+
+
+# ============================================================
+# 19. MENU THỐNG KÊ
+# ============================================================
+
+def menu_thong_ke(ds):
+    while True:
+        print("\n" + "=" * 55)
+        print("                TÍNH TOÁN / THỐNG KÊ")
+        print("=" * 55)
+
+        print("1. Thống kê tổng quan")
+        print("2. Thời gian ôn theo môn")
+        print("3. Tài liệu theo mức độ")
+        print("4. Lịch ôn theo trạng thái")
+        print("5. Cảnh báo lịch trùng")
+        print("0. Quay lại")
+
+        choice = input("Lựa chọn: ").strip()
+
+        if choice == "1":
+            thong_ke_tong_quan(ds)
+
+        elif choice == "2":
+            thong_ke_thoi_gian_theo_mon(ds)
+
+        elif choice == "3":
+            thong_ke_muc_do(ds)
+
+        elif choice == "4":
+            thong_ke_trang_thai(ds)
+
+        elif choice == "5":
+            canh_bao_lich_trung(ds)
+
+        elif choice == "0":
+            break
+
+        else:
+            print("Lựa chọn không hợp lệ!")
+
+
+# ============================================================
+# 20. LƯU DỮ LIỆU VÀO FILE TXT
+# ============================================================
+
+def luu_du_lieu(ds, filename="data.txt"):
+    try:
+        with open(filename, "w", encoding="utf-8") as file:
+
+            for item in ds:
+                line = "|".join([
+                    item["ma_tai_lieu"],
+                    item["ten_tai_lieu"],
+                    item["mon_hoc"],
+                    item["loai_tai_lieu"],
+                    str(item["so_trang"]),
+                    item["muc_do"],
+                    item["ngay_tao"],
+                    item["ma_lich"],
+                    item["ngay_on"],
+                    item["thoi_gian"],
+                    item["noi_dung"],
+                    str(item["thoi_luong"]),
+                    item["trang_thai"]
+                ])
+
+                file.write(line + "\n")
+
+        print(f"Lưu dữ liệu thành công vào file {filename}!")
+
+    except PermissionError:
+        print("Lỗi: Không có quyền ghi file.")
+
+    except OSError as e:
+        print("Lỗi khi ghi file:", e)
+
+
+# ============================================================
+# 21. ĐỌC DỮ LIỆU TỪ FILE TXT
+# ============================================================
+
+def doc_du_lieu(filename="data.txt"):
+    ds = []
+
+    try:
+        with open(filename, "r", encoding="utf-8") as file:
+
+            for line_number, line in enumerate(file, 1):
+
+                line = line.strip()
+
+                if line == "":
+                    continue
+
+                parts = line.split("|")
+
+                if len(parts) != 13:
+                    print(
+                        f"Cảnh báo: Dòng {line_number} "
+                        f"không đúng định dạng."
+                    )
+                    continue
+
+                try:
+                    item = {
+                        "ma_tai_lieu": parts[0],
+                        "ten_tai_lieu": parts[1],
+                        "mon_hoc": parts[2],
+                        "loai_tai_lieu": parts[3],
+                        "so_trang": int(parts[4]),
+                        "muc_do": parts[5],
+                        "ngay_tao": parts[6],
+                        "ma_lich": parts[7],
+                        "ngay_on": parts[8],
+                        "thoi_gian": parts[9],
+                        "noi_dung": parts[10],
+                        "thoi_luong": int(parts[11]),
+                        "trang_thai": parts[12]
+                    }
+
+                    ds.append(item)
+
+                except ValueError:
+                    print(
+                        f"Cảnh báo: Không thể chuyển kiểu dữ liệu "
+                        f"ở dòng {line_number}."
+                    )
+
+        print(f"Đọc dữ liệu thành công: {len(ds)} bản ghi.")
+
+    except FileNotFoundError:
+        print(f"Không tìm thấy file {filename}.")
+        print("Chương trình sẽ sử dụng danh sách rỗng.")
+
+    except PermissionError:
+        print("Lỗi: Không có quyền đọc file.")
+
+    except OSError as e:
+        print("Lỗi khi đọc file:", e)
+
+    return ds
+
+
+# ============================================================
+# 22. MENU CHÍNH
+# ============================================================
+
+def menu_chinh():
+    print("\n" + "=" * 70)
+    print("      ỨNG DỤNG QUẢN LÝ SÁCH BÀI TẬP VÀ LỊCH ÔN TẬP")
+    print("=" * 70)
+
+    print("1. Thêm")
+    print("2. Hiển thị danh sách")
+    print("3. Cập nhật")
+    print("4. Xóa")
+    print("5. Tìm kiếm")
+    print("6. Sắp xếp")
+    print("7. Tính toán / Thống kê")
+    print("8. Lưu dữ liệu")
+    print("9. Đọc dữ liệu")
+    print("0. Thoát")
+
+    print("-" * 70)
+
+
+# ============================================================
+# 23. CHƯƠNG TRÌNH CHÍNH
+# ============================================================
+
+def main():
+
+    # Đọc dữ liệu khi khởi động
+    danh_sach = doc_du_lieu()
+
+    while True:
+
+        menu_chinh()
+
+        choice = input("Lựa chọn: ").strip()
+
+        if choice == "1":
+            them_ban_ghi(danh_sach)
+
+        elif choice == "2":
+            hien_thi_danh_sach(danh_sach)
+
+        elif choice == "3":
+            cap_nhat(danh_sach)
+
+        elif choice == "4":
+            xoa(danh_sach)
+
+        elif choice == "5":
+            menu_tim_kiem(danh_sach)
+
+        elif choice == "6":
+            sap_xep(danh_sach)
+
+        elif choice == "7":
+            menu_thong_ke(danh_sach)
+
+        elif choice == "8":
+            luu_du_lieu(danh_sach)
+
+        elif choice == "9":
+            danh_sach = doc_du_lieu()
+
+        elif choice == "0":
+
+            # Tự động lưu trước khi thoát
+            luu_du_lieu(danh_sach)
+
+            print("\nCảm ơn bạn đã sử dụng chương trình!")
+            print("Chương trình kết thúc.")
+            break
+
+        else:
+            print("Lựa chọn không hợp lệ! Vui lòng chọn lại.")
+
+
+# ============================================================
+# CHẠY CHƯƠNG TRÌNH
+# ============================================================
+
+if __name__ == "__main__":
+    main()
